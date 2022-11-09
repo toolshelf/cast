@@ -7,6 +7,7 @@ import (
 	"math"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 func ToInt(i interface{}) (int, error) {
@@ -412,35 +413,35 @@ func ToFloat32(i interface{}) (float32, error) {
 func ToFloat64(i interface{}) (float64, error) {
 	i = internal.Indirect(i)
 
-	switch s := i.(type) {
+	switch v := i.(type) {
 	case float64:
-		return s, nil
+		return v, nil
 	case float32:
-		return float64(s), nil
+		return float64(v), nil
 	case int:
-		return internal.IntToFloat[int, float64](s)
+		return internal.IntToFloat[int, float64](v)
 	case int64:
-		return internal.IntToFloat[int64, float64](s)
+		return internal.IntToFloat[int64, float64](v)
 	case int32:
-		return internal.IntToFloat[int32, float64](s)
+		return internal.IntToFloat[int32, float64](v)
 	case int16:
-		return internal.IntToFloat[int16, float64](s)
+		return internal.IntToFloat[int16, float64](v)
 	case int8:
-		return internal.IntToFloat[int8, float64](s)
+		return internal.IntToFloat[int8, float64](v)
 	case uint:
-		return internal.IntToFloat[uint, float64](s)
+		return internal.IntToFloat[uint, float64](v)
 	case uint64:
-		return internal.IntToFloat[uint64, float64](s)
+		return internal.IntToFloat[uint64, float64](v)
 	case uint32:
-		return internal.IntToFloat[uint32, float64](s)
+		return internal.IntToFloat[uint32, float64](v)
 	case uint16:
-		return internal.IntToFloat[uint16, float64](s)
+		return internal.IntToFloat[uint16, float64](v)
 	case uint8:
-		return internal.IntToFloat[uint8, float64](s)
+		return internal.IntToFloat[uint8, float64](v)
 	case string:
-		return internal.StringToFloat[float64](s)
+		return internal.StringToFloat[float64](v)
 	case bool:
-		return internal.BoolToNumber[float64](s), nil
+		return internal.BoolToNumber[float64](v), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Float64.String())
 	}
@@ -449,52 +450,77 @@ func ToFloat64(i interface{}) (float64, error) {
 func ToString(i interface{}) (string, error) {
 	i = internal.IndirectToStringerOrError(i)
 
-	switch s := i.(type) {
+	switch v := i.(type) {
 	case string:
-		return s, nil
+		return v, nil
 	case bool:
-		return strconv.FormatBool(s), nil
+		return strconv.FormatBool(v), nil
 	case float64:
-		return strconv.FormatFloat(s, 'f', -1, 64), nil
+		return strconv.FormatFloat(v, 'f', -1, 64), nil
 	case float32:
-		return strconv.FormatFloat(float64(s), 'f', -1, 32), nil
+		return strconv.FormatFloat(float64(v), 'f', -1, 32), nil
 	case int:
-		return strconv.Itoa(s), nil
+		return strconv.Itoa(v), nil
 	case int64:
-		return strconv.FormatInt(s, 10), nil
+		return strconv.FormatInt(v, 10), nil
 	case int32:
-		return strconv.Itoa(int(s)), nil
+		return strconv.Itoa(int(v)), nil
 	case int16:
-		return strconv.FormatInt(int64(s), 10), nil
+		return strconv.FormatInt(int64(v), 10), nil
 	case int8:
-		return strconv.FormatInt(int64(s), 10), nil
+		return strconv.FormatInt(int64(v), 10), nil
 	case uint:
-		return strconv.FormatUint(uint64(s), 10), nil
+		return strconv.FormatUint(uint64(v), 10), nil
 	case uint64:
-		return strconv.FormatUint(s, 10), nil
+		return strconv.FormatUint(v, 10), nil
 	case uint32:
-		return strconv.FormatUint(uint64(s), 10), nil
+		return strconv.FormatUint(uint64(v), 10), nil
 	case uint16:
-		return strconv.FormatUint(uint64(s), 10), nil
+		return strconv.FormatUint(uint64(v), 10), nil
 	case uint8:
-		return strconv.FormatUint(uint64(s), 10), nil
+		return strconv.FormatUint(uint64(v), 10), nil
 	case []byte:
-		return string(s), nil
+		return string(v), nil
 	case template.HTML:
-		return string(s), nil
+		return string(v), nil
 	case template.URL:
-		return string(s), nil
+		return string(v), nil
 	case template.JS:
-		return string(s), nil
+		return string(v), nil
 	case template.CSS:
-		return string(s), nil
+		return string(v), nil
 	case template.HTMLAttr:
-		return string(s), nil
+		return string(v), nil
 	case fmt.Stringer:
-		return s.String(), nil
+		return v.String(), nil
 	case error:
-		return s.Error(), nil
+		return v.Error(), nil
 	default:
 		return "", internal.SyntaxError(i, reflect.String.String())
+	}
+}
+
+func ToTime(i interface{}) (time.Time, error) {
+	i = internal.Indirect(i)
+
+	switch v := i.(type) {
+	case time.Time:
+		return v, nil
+	case string:
+		return internal.StringToTime(v)
+	case int:
+		return internal.IntToTime[int](v)
+	case int32:
+		return internal.IntToTime[int32](v)
+	case int64:
+		return internal.IntToTime[int64](v)
+	case uint:
+		return internal.IntToTime[uint](v)
+	case uint32:
+		return internal.IntToTime[uint32](v)
+	case uint64:
+		return internal.IntToTime[uint64](v)
+	default:
+		return time.Time{}, internal.SyntaxError(i, reflect.TypeOf((*time.Time)(nil)).Elem().String())
 	}
 }
