@@ -1,8 +1,12 @@
 package cast
 
 import (
+	"fmt"
 	"github.com/toolshelf/cast/internal"
+	"html/template"
+	"math"
 	"reflect"
+	"strconv"
 )
 
 func ToInt(i interface{}) (int, error) {
@@ -35,7 +39,7 @@ func ToInt(i interface{}) (int, error) {
 	case string:
 		return internal.StringToInt[int](s)
 	case bool:
-		return internal.BoolToInt[int](s), nil
+		return internal.BoolToNumber[int](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Int.String())
 	}
@@ -71,7 +75,7 @@ func ToInt8(i interface{}) (int8, error) {
 	case string:
 		return internal.StringToInt[int8](s)
 	case bool:
-		return internal.BoolToInt[int8](s), nil
+		return internal.BoolToNumber[int8](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Int8.String())
 	}
@@ -107,7 +111,7 @@ func ToInt16(i interface{}) (int16, error) {
 	case string:
 		return internal.StringToInt[int16](s)
 	case bool:
-		return internal.BoolToInt[int16](s), nil
+		return internal.BoolToNumber[int16](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Int16.String())
 	}
@@ -143,7 +147,7 @@ func ToInt32(i interface{}) (int32, error) {
 	case string:
 		return internal.StringToInt[int32](s)
 	case bool:
-		return internal.BoolToInt[int32](s), nil
+		return internal.BoolToNumber[int32](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Int32.String())
 	}
@@ -179,7 +183,7 @@ func ToInt64(i interface{}) (int64, error) {
 	case string:
 		return internal.StringToInt[int64](s)
 	case bool:
-		return internal.BoolToInt[int64](s), nil
+		return internal.BoolToNumber[int64](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Int64.String())
 	}
@@ -215,7 +219,7 @@ func ToUint(i interface{}) (uint, error) {
 	case string:
 		return internal.StringToUint[uint](s)
 	case bool:
-		return internal.BoolToInt[uint](s), nil
+		return internal.BoolToNumber[uint](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Uint.String())
 	}
@@ -251,7 +255,7 @@ func ToUint8(i interface{}) (uint8, error) {
 	case string:
 		return internal.StringToUint[uint8](s)
 	case bool:
-		return internal.BoolToInt[uint8](s), nil
+		return internal.BoolToNumber[uint8](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Uint8.String())
 	}
@@ -287,7 +291,7 @@ func ToUint16(i interface{}) (uint16, error) {
 	case string:
 		return internal.StringToUint[uint16](s)
 	case bool:
-		return internal.BoolToInt[uint16](s), nil
+		return internal.BoolToNumber[uint16](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Uint16.String())
 	}
@@ -323,7 +327,7 @@ func ToUint32(i interface{}) (uint32, error) {
 	case string:
 		return internal.StringToUint[uint32](s)
 	case bool:
-		return internal.BoolToInt[uint32](s), nil
+		return internal.BoolToNumber[uint32](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Uint32.String())
 	}
@@ -359,8 +363,138 @@ func ToUint64(i interface{}) (uint64, error) {
 	case string:
 		return internal.StringToUint[uint64](s)
 	case bool:
-		return internal.BoolToInt[uint64](s), nil
+		return internal.BoolToNumber[uint64](s), nil
 	default:
 		return 0, internal.SyntaxError(i, reflect.Uint64.String())
+	}
+}
+
+func ToFloat32(i interface{}) (float32, error) {
+	i = internal.Indirect(i)
+
+	switch s := i.(type) {
+	case float64:
+		if s < -math.MaxFloat32 || s > math.MaxFloat32 {
+			return 0, internal.RangeError(i, reflect.Float32.String())
+		}
+		return float32(s), nil
+	case float32:
+		return s, nil
+	case int:
+		return internal.IntToFloat[int, float32](s)
+	case int64:
+		return internal.IntToFloat[int64, float32](s)
+	case int32:
+		return internal.IntToFloat[int32, float32](s)
+	case int16:
+		return internal.IntToFloat[int16, float32](s)
+	case int8:
+		return internal.IntToFloat[int8, float32](s)
+	case uint:
+		return internal.IntToFloat[uint, float32](s)
+	case uint64:
+		return internal.IntToFloat[uint64, float32](s)
+	case uint32:
+		return internal.IntToFloat[uint32, float32](s)
+	case uint16:
+		return internal.IntToFloat[uint16, float32](s)
+	case uint8:
+		return internal.IntToFloat[uint8, float32](s)
+	case string:
+		return internal.StringToFloat[float32](s)
+	case bool:
+		return internal.BoolToNumber[float32](s), nil
+	default:
+		return 0, internal.SyntaxError(i, reflect.Float32.String())
+	}
+}
+
+func ToFloat64(i interface{}) (float64, error) {
+	i = internal.Indirect(i)
+
+	switch s := i.(type) {
+	case float64:
+		return s, nil
+	case float32:
+		return float64(s), nil
+	case int:
+		return internal.IntToFloat[int, float64](s)
+	case int64:
+		return internal.IntToFloat[int64, float64](s)
+	case int32:
+		return internal.IntToFloat[int32, float64](s)
+	case int16:
+		return internal.IntToFloat[int16, float64](s)
+	case int8:
+		return internal.IntToFloat[int8, float64](s)
+	case uint:
+		return internal.IntToFloat[uint, float64](s)
+	case uint64:
+		return internal.IntToFloat[uint64, float64](s)
+	case uint32:
+		return internal.IntToFloat[uint32, float64](s)
+	case uint16:
+		return internal.IntToFloat[uint16, float64](s)
+	case uint8:
+		return internal.IntToFloat[uint8, float64](s)
+	case string:
+		return internal.StringToFloat[float64](s)
+	case bool:
+		return internal.BoolToNumber[float64](s), nil
+	default:
+		return 0, internal.SyntaxError(i, reflect.Float64.String())
+	}
+}
+
+func ToString(i interface{}) (string, error) {
+	i = internal.IndirectToStringerOrError(i)
+
+	switch s := i.(type) {
+	case string:
+		return s, nil
+	case bool:
+		return strconv.FormatBool(s), nil
+	case float64:
+		return strconv.FormatFloat(s, 'f', -1, 64), nil
+	case float32:
+		return strconv.FormatFloat(float64(s), 'f', -1, 32), nil
+	case int:
+		return strconv.Itoa(s), nil
+	case int64:
+		return strconv.FormatInt(s, 10), nil
+	case int32:
+		return strconv.Itoa(int(s)), nil
+	case int16:
+		return strconv.FormatInt(int64(s), 10), nil
+	case int8:
+		return strconv.FormatInt(int64(s), 10), nil
+	case uint:
+		return strconv.FormatUint(uint64(s), 10), nil
+	case uint64:
+		return strconv.FormatUint(s, 10), nil
+	case uint32:
+		return strconv.FormatUint(uint64(s), 10), nil
+	case uint16:
+		return strconv.FormatUint(uint64(s), 10), nil
+	case uint8:
+		return strconv.FormatUint(uint64(s), 10), nil
+	case []byte:
+		return string(s), nil
+	case template.HTML:
+		return string(s), nil
+	case template.URL:
+		return string(s), nil
+	case template.JS:
+		return string(s), nil
+	case template.CSS:
+		return string(s), nil
+	case template.HTMLAttr:
+		return string(s), nil
+	case fmt.Stringer:
+		return s.String(), nil
+	case error:
+		return s.Error(), nil
+	default:
+		return "", internal.SyntaxError(i, reflect.String.String())
 	}
 }

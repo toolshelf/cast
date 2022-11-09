@@ -20,8 +20,14 @@ type Float interface {
 	float32 | float64
 }
 
-var MaxSafeInteger = 1<<53 - 1
-var MinSafeInteger = -MaxSafeInteger
+type Number interface {
+	SignedInt | UnsignedInt | Float
+}
+
+var MaxSafeInteger32 = 1<<24 - 1
+var MinSafeInteger32 = -MaxSafeInteger32
+var MaxSafeInteger64 = 1<<53 - 1
+var MinSafeInteger64 = -MaxSafeInteger64
 
 func IntToInt[Input SignedInt | UnsignedInt, Output SignedInt](in Input) (ret Output, err error) {
 	switch unsafe.Sizeof(ret) {
@@ -90,7 +96,7 @@ func FloatToInt[Input Float, Output SignedInt](in Input) (ret Output, err error)
 	if frac != 0.0 {
 		return ret, SyntaxError(in, reflect.TypeOf(ret).String())
 	}
-	if integer < float64(MinSafeInteger) || float64(MaxSafeInteger) < integer {
+	if integer < float64(MinSafeInteger64) || float64(MaxSafeInteger64) < integer {
 		return ret, SafeError(in, reflect.TypeOf(ret).String())
 	}
 
@@ -128,7 +134,7 @@ func FloatToUint[Input Float, Output UnsignedInt](in Input) (ret Output, err err
 	if integer < 0 {
 		return ret, RangeError(in, reflect.TypeOf(ret).String())
 	}
-	if integer > float64(MaxSafeInteger) {
+	if integer > float64(MaxSafeInteger64) {
 		return ret, SafeError(in, reflect.TypeOf(ret).String())
 	}
 
@@ -158,11 +164,11 @@ func FloatToUint[Input Float, Output UnsignedInt](in Input) (ret Output, err err
 	return ret, err
 }
 
-func BoolToInt[Output SignedInt | UnsignedInt](in bool) Output {
+func BoolToNumber[Output Number](in bool) Output {
 	if in {
-		return 1
+		return Output(1)
 	}
-	return 0
+	return Output(0)
 }
 
 func StringToInt[Output SignedInt](in string) (ret Output, err error) {
@@ -215,4 +221,33 @@ func StringToUint[Output UnsignedInt](in string) (ret Output, err error) {
 	}
 
 	return 0, SyntaxError(in, reflect.TypeOf(ret).String())
+}
+
+func StringToFloat[Output Float](in string) (ret Output, err error) {
+	var size = int(unsafe.Sizeof(ret))
+	if f, inErr := strconv.ParseFloat(in, size*8); inErr == nil {
+		return Output(f), nil
+	} else if errors.Is(inErr, strconv.ErrRange) {
+		return 0, RangeError(in, reflect.TypeOf(ret).String())
+	}
+	return 0, SyntaxError(in, reflect.TypeOf(ret).String())
+}
+
+func IntToFloat[Input SignedInt | UnsignedInt, Output Float](in Input) (ret Output, err error) {
+	switch unsafe.Sizeof(ret) {
+	case 4:
+		if in < 0 && int64(in) < int64(MinSafeInteger32) || in > 0 && uint64(in) > uint64(MaxSafeInteger32) {
+			err = SafeError(in, reflect.TypeOf(ret).String())
+		} else {
+			ret = Output(in)
+		}
+	case 8:
+		if in < 0 && int64(in) < int64(MinSafeInteger64) || in > 0 && uint64(in) > uint64(MaxSafeInteger64) {
+			err = SafeError(in, reflect.TypeOf(ret).String())
+		} else {
+			ret = Output(in)
+		}
+	}
+
+	return ret, err
 }

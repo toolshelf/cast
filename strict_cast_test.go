@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/toolshelf/cast/internal"
+	"html/template"
 	"math"
 	"testing"
 )
 
-func TestStrictCastToInt(t *testing.T) {
+func TestToInt(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect int
@@ -37,10 +38,10 @@ func TestStrictCastToInt(t *testing.T) {
 		{"1.798E308", 0, internal.ErrRange},
 		{8.8, 0, internal.ErrSyntax},
 		{uint64(math.MaxInt + 1), 0, internal.ErrRange},
-		{float64(internal.MaxSafeInteger), internal.MaxSafeInteger, nil},
-		{float64(internal.MaxSafeInteger + 1), 0, internal.ErrSafe},
-		{float64(internal.MinSafeInteger), internal.MinSafeInteger, nil},
-		{float64(internal.MinSafeInteger - 1), 0, internal.ErrSafe},
+		{float64(internal.MaxSafeInteger64), internal.MaxSafeInteger64, nil},
+		{float64(internal.MaxSafeInteger64 + 1), 0, internal.ErrSafe},
+		{float64(internal.MinSafeInteger64), internal.MinSafeInteger64, nil},
+		{float64(internal.MinSafeInteger64 - 1), 0, internal.ErrSafe},
 	}
 
 	for _, test := range tests {
@@ -51,7 +52,7 @@ func TestStrictCastToInt(t *testing.T) {
 	}
 }
 
-func TestStrictCastToInt8(t *testing.T) {
+func TestToInt8(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect int8
@@ -93,7 +94,7 @@ func TestStrictCastToInt8(t *testing.T) {
 	}
 }
 
-func TestStrictCastToInt16(t *testing.T) {
+func TestToInt16(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect int16
@@ -131,7 +132,7 @@ func TestStrictCastToInt16(t *testing.T) {
 	}
 }
 
-func TestStrictCastToInt32(t *testing.T) {
+func TestToInt32(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect int32
@@ -149,6 +150,7 @@ func TestStrictCastToInt32(t *testing.T) {
 		{uint32(8), 8, nil},
 		{uint64(8), 8, nil},
 		{float32(8.0), 8, nil},
+		{8.8, 0, internal.ErrSyntax},
 		{8.0, 8, nil},
 		{"8", 8, nil},
 		{"8.8", 0, internal.ErrSyntax},
@@ -158,8 +160,8 @@ func TestStrictCastToInt32(t *testing.T) {
 		{int64(math.MaxInt32), math.MaxInt32, nil},
 		{int64(math.MaxInt32 + 1), 0, internal.ErrRange},
 		{int64(math.MinInt32), math.MinInt32, nil},
-		{float64(internal.MaxSafeInteger), 0, internal.ErrRange},
-		{float64(internal.MinSafeInteger), 0, internal.ErrRange},
+		{float64(internal.MaxSafeInteger64), 0, internal.ErrRange},
+		{float64(internal.MinSafeInteger64), 0, internal.ErrRange},
 	}
 
 	for _, test := range tests {
@@ -170,7 +172,7 @@ func TestStrictCastToInt32(t *testing.T) {
 	}
 }
 
-func TestStrictCastToInt64(t *testing.T) {
+func TestToInt64(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect int64
@@ -196,10 +198,10 @@ func TestStrictCastToInt64(t *testing.T) {
 		{"123abc", 0, internal.ErrSyntax},
 		{8.8, 0, internal.ErrSyntax},
 		{uint64(math.MaxInt64 + 1), 0, internal.ErrRange},
-		{float64(internal.MaxSafeInteger), int64(internal.MaxSafeInteger), nil},
-		{float64(internal.MaxSafeInteger + 1), 0, internal.ErrSafe},
-		{float64(internal.MinSafeInteger), int64(internal.MinSafeInteger), nil},
-		{float64(internal.MinSafeInteger - 1), 0, internal.ErrSafe},
+		{float64(internal.MaxSafeInteger64), int64(internal.MaxSafeInteger64), nil},
+		{float64(internal.MaxSafeInteger64 + 1), 0, internal.ErrSafe},
+		{float64(internal.MinSafeInteger64), int64(internal.MinSafeInteger64), nil},
+		{float64(internal.MinSafeInteger64 - 1), 0, internal.ErrSafe},
 	}
 
 	for _, test := range tests {
@@ -211,7 +213,7 @@ func TestStrictCastToInt64(t *testing.T) {
 	}
 }
 
-func TestStrictCastToUint(t *testing.T) {
+func TestToUint(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect uint
@@ -240,8 +242,8 @@ func TestStrictCastToUint(t *testing.T) {
 		{"1.798E308", 0, internal.ErrRange},
 		{8.8, 0, internal.ErrSyntax},
 		{uint64(math.MaxUint), math.MaxUint, nil},
-		{float64(internal.MaxSafeInteger), uint(internal.MaxSafeInteger), nil},
-		{float64(internal.MaxSafeInteger + 1), 0, internal.ErrSafe},
+		{float64(internal.MaxSafeInteger64), uint(internal.MaxSafeInteger64), nil},
+		{float64(internal.MaxSafeInteger64 + 1), 0, internal.ErrSafe},
 	}
 
 	for _, test := range tests {
@@ -252,7 +254,7 @@ func TestStrictCastToUint(t *testing.T) {
 	}
 }
 
-func TestStrictCastToUint8(t *testing.T) {
+func TestToUint8(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect uint8
@@ -293,7 +295,7 @@ func TestStrictCastToUint8(t *testing.T) {
 	}
 }
 
-func TestStrictCastToUint16(t *testing.T) {
+func TestToUint16(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect uint16
@@ -331,7 +333,7 @@ func TestStrictCastToUint16(t *testing.T) {
 	}
 }
 
-func TestStrictCastToUint32(t *testing.T) {
+func TestToUint32(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect uint32
@@ -358,7 +360,7 @@ func TestStrictCastToUint32(t *testing.T) {
 		{8.8, 0, internal.ErrSyntax},
 		{int64(math.MaxUint32), math.MaxUint32, nil},
 		{int64(math.MaxUint32 + 1), 0, internal.ErrRange},
-		{float64(internal.MaxSafeInteger), 0, internal.ErrRange},
+		{float64(internal.MaxSafeInteger64), 0, internal.ErrRange},
 	}
 
 	for _, test := range tests {
@@ -369,7 +371,7 @@ func TestStrictCastToUint32(t *testing.T) {
 	}
 }
 
-func TestStrictCastToUint64(t *testing.T) {
+func TestToUint64(t *testing.T) {
 	tests := []struct {
 		input  interface{}
 		expect uint64
@@ -396,12 +398,123 @@ func TestStrictCastToUint64(t *testing.T) {
 		{"123abc", 0, internal.ErrSyntax},
 		{8.8, 0, internal.ErrSyntax},
 		{uint64(math.MaxUint64), uint64(math.MaxUint64), nil},
-		{float64(internal.MaxSafeInteger), uint64(internal.MaxSafeInteger), nil},
-		{float64(internal.MaxSafeInteger + 1), 0, internal.ErrSafe},
+		{float64(internal.MaxSafeInteger64), uint64(internal.MaxSafeInteger64), nil},
+		{float64(internal.MaxSafeInteger64 + 1), 0, internal.ErrSafe},
 	}
 
 	for _, test := range tests {
 		v, err := ToUint64(test.input)
+		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
+			fmt.Printf("%#v\n", test)
+			fmt.Println(v, err)
+		}
+	}
+}
+
+func TestToFloat32(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect float32
+		err    error
+	}{
+		{8, 8, nil},
+		{int8(8), 8, nil},
+		{int16(8), 8, nil},
+		{int32(8), 8, nil},
+		{int64(8), 8, nil},
+		{uint(8), 8, nil},
+		{uint8(8), 8, nil},
+		{uint16(8), 8, nil},
+		{uint32(8), 8, nil},
+		{uint64(8), 8, nil},
+		{float32(8.31), 8.31, nil},
+		{8.31, 8.31, nil},
+		{"8.31", 8.31, nil},
+		{true, 1, nil},
+		{false, 0, nil},
+		{internal.MinSafeInteger32, float32(internal.MinSafeInteger32), nil},
+		{internal.MaxSafeInteger32, float32(internal.MaxSafeInteger32), nil},
+		{internal.MinSafeInteger32 - 1, 0, internal.ErrSafe},
+		{internal.MaxSafeInteger32 + 1, 0, internal.ErrSafe},
+	}
+
+	for _, test := range tests {
+		v, err := ToFloat32(test.input)
+		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
+			fmt.Printf("%#v\n", test)
+			fmt.Println(v, err)
+		}
+	}
+}
+
+func TestToFloat64(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect float64
+		err    error
+	}{
+		{8, 8, nil},
+		{int8(8), 8, nil},
+		{int16(8), 8, nil},
+		{int32(8), 8, nil},
+		{int64(8), 8, nil},
+		{uint(8), 8, nil},
+		{uint8(8), 8, nil},
+		{uint16(8), 8, nil},
+		{uint32(8), 8, nil},
+		{uint64(8), 8, nil},
+		{float32(8.31), 8.3100004196167, nil},
+		{8.31, 8.31, nil},
+		{"8.31", 8.31, nil},
+		{true, 1, nil},
+		{false, 0, nil},
+		{internal.MinSafeInteger64, float64(internal.MinSafeInteger64), nil},
+		{internal.MaxSafeInteger64, float64(internal.MaxSafeInteger64), nil},
+		{internal.MinSafeInteger64 - 1, 0, internal.ErrSafe},
+		{internal.MaxSafeInteger64 + 1, 0, internal.ErrSafe},
+	}
+
+	for _, test := range tests {
+		v, err := ToFloat64(test.input)
+		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
+			fmt.Printf("%#v\n", test)
+			fmt.Println(v, err)
+		}
+	}
+}
+
+func TestToString(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect string
+		err    error
+	}{
+		{nil, "", internal.ErrSyntax},
+		{8, "8", nil},
+		{int8(8), "8", nil},
+		{int16(8), "8", nil},
+		{int32(8), "8", nil},
+		{int64(8), "8", nil},
+		{uint(8), "8", nil},
+		{uint8(8), "8", nil},
+		{uint16(8), "8", nil},
+		{uint32(8), "8", nil},
+		{uint64(8), "8", nil},
+		{float32(8.31), "8.31", nil},
+		{8.31, "8.31", nil},
+		{true, "true", nil},
+		{false, "false", nil},
+		{[]byte("one time"), "one time", nil},
+		{"one more time", "one more time", nil},
+		{template.HTML("one time"), "one time", nil},
+		{template.URL("https://www.baidu.com"), "https://www.baidu.com", nil},
+		{template.JS("(1+2)"), "(1+2)", nil},
+		{template.CSS("a"), "a", nil},
+		{template.HTMLAttr("a"), "a", nil},
+	}
+
+	for _, test := range tests {
+		v, err := ToString(test.input)
 		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
 			fmt.Printf("%#v\n", test)
 			fmt.Println(v, err)
