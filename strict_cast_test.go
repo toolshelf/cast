@@ -574,3 +574,46 @@ func TestToTime(t *testing.T) {
 		}
 	}
 }
+
+func TestToDuration(t *testing.T) {
+	var d time.Duration = 5
+
+	tests := []struct {
+		input  interface{}
+		expect time.Duration
+		err    error
+	}{
+		{time.Duration(5), d, nil},
+		{int(5), d, nil},
+		{int64(5), d, nil},
+		{int32(5), d, nil},
+		{int16(5), d, nil},
+		{int8(5), d, nil},
+		{uint(5), d, nil},
+		{uint64(5), d, nil},
+		{uint32(5), d, nil},
+		{uint16(5), d, nil},
+		{uint8(5), d, nil},
+		{float64(5), d, nil},
+		{float32(5), d, nil},
+		{string("5"), d, nil},
+		{string("5ns"), d, nil},
+		{string("5us"), time.Microsecond * d, nil},
+		{string("5µs"), time.Microsecond * d, nil},
+		{string("5ms"), time.Millisecond * d, nil},
+		{string("5s"), time.Second * d, nil},
+		{string("5m"), time.Minute * d, nil},
+		{string("5h"), time.Hour * d, nil},
+		// errors
+		{"test", 0, internal.ErrSyntax},
+		{testing.T{}, 0, internal.ErrSyntax},
+	}
+
+	for _, test := range tests {
+		v, err := ToDuration(test.input)
+		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
+			fmt.Printf("%#v\n", test)
+			fmt.Println(v, err)
+		}
+	}
+}
