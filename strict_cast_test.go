@@ -529,39 +529,38 @@ func TestToTime(t *testing.T) {
 		expect time.Time
 		err    error
 	}{
-		{"2009-11-10 23:00:00 +0000 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},   // Time.String()
-		{"Tue Nov 10 23:00:00 2009", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},        // ANSIC
-		{"Tue Nov 10 23:00:00 UTC 2009", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},    // UnixDate
-		{"Tue Nov 10 23:00:00 +0000 2009", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},  // RubyDate
-		{"10 Nov 09 23:00 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},             // RFC822
-		{"10 Nov 09 23:00 +0000", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},           // RFC822Z
-		{"Tuesday, 10-Nov-09 23:00:00 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil}, // RFC850
-		{"Tue, 10 Nov 2009 23:00:00 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},   // RFC1123
-		{"Tue, 10 Nov 2009 23:00:00 +0000", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil}, // RFC1123Z
-		{"2009-11-10T23:00:00Z", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},            // RFC3339
-		{"2018-10-21T23:21:29+0200", time.Date(2018, 10, 21, 21, 21, 29, 0, time.UTC), nil},      // RFC3339 without timezone hh:mm colon
-		{"2009-11-10T23:00:00Z", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},            // RFC3339Nano
-		{"11:00PM", time.Date(0, 1, 1, 23, 0, 0, 0, time.UTC), nil},                              // Kitchen
-		{"Nov 10 23:00:00", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},                    // Stamp
-		{"Nov 10 23:00:00.000", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},                // StampMilli
-		{"Nov 10 23:00:00.000000", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},             // StampMicro
-		{"Nov 10 23:00:00.000000000", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},          // StampNano
-		{"2016-03-06 15:28:01-00:00", time.Date(2016, 3, 6, 15, 28, 1, 0, time.UTC), nil},        // RFC3339 without T
-		{"2016-03-06 15:28:01-0000", time.Date(2016, 3, 6, 15, 28, 1, 0, time.UTC), nil},         // RFC3339 without T or timezone hh:mm colon
+		{"2009-11-10 23:00:00 +0000 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Tue Nov 10 23:00:00 2009", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Tue Nov 10 23:00:00 UTC 2009", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Tue Nov 10 23:00:00 +0000 2009", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"10 Nov 09 23:00 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"10 Nov 09 23:00 +0000", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Tuesday, 10-Nov-09 23:00:00 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Tue, 10 Nov 2009 23:00:00 UTC", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Tue, 10 Nov 2009 23:00:00 +0000", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"2009-11-10T23:00:00Z", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"2018-10-21T23:21:29+0200", time.Date(2018, 10, 21, 21, 21, 29, 0, time.UTC), nil},
+		{"2009-11-10T23:00:00Z", time.Date(2009, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"11:00PM", time.Date(0, 1, 1, 23, 0, 0, 0, time.UTC), nil},
+		{"Nov 10 23:00:00", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Nov 10 23:00:00.000", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Nov 10 23:00:00.000000", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"Nov 10 23:00:00.000000000", time.Date(0, 11, 10, 23, 0, 0, 0, time.UTC), nil},
+		{"2016-03-06 15:28:01-00:00", time.Date(2016, 3, 6, 15, 28, 1, 0, time.UTC), nil},
+		{"2016-03-06 15:28:01-0000", time.Date(2016, 3, 6, 15, 28, 1, 0, time.UTC), nil},
 		{"2016-03-06 15:28:01", time.Date(2016, 3, 6, 15, 28, 1, 0, time.UTC), nil},
 		{"2016-03-06 15:28:01 -0000", time.Date(2016, 3, 6, 15, 28, 1, 0, time.UTC), nil},
 		{"2016-03-06 15:28:01 -00:00", time.Date(2016, 3, 6, 15, 28, 1, 0, time.UTC), nil},
 		{"2006-01-02", time.Date(2006, 1, 2, 0, 0, 0, 0, time.UTC), nil},
 		{"02 Jan 2006", time.Date(2006, 1, 2, 0, 0, 0, 0, time.UTC), nil},
 		{1472574600, time.Date(2016, 8, 30, 16, 30, 0, 0, time.UTC), nil},
-		{int(1482597504), time.Date(2016, 12, 24, 16, 38, 24, 0, time.UTC), nil},
+		{1482597504, time.Date(2016, 12, 24, 16, 38, 24, 0, time.UTC), nil},
 		{int64(1234567890), time.Date(2009, 2, 13, 23, 31, 30, 0, time.UTC), nil},
 		{int32(1234567890), time.Date(2009, 2, 13, 23, 31, 30, 0, time.UTC), nil},
 		{uint(1482597504), time.Date(2016, 12, 24, 16, 38, 24, 0, time.UTC), nil},
 		{uint64(1234567890), time.Date(2009, 2, 13, 23, 31, 30, 0, time.UTC), nil},
 		{uint32(1234567890), time.Date(2009, 2, 13, 23, 31, 30, 0, time.UTC), nil},
 		{time.Date(2009, 2, 13, 23, 31, 30, 0, time.UTC), time.Date(2009, 2, 13, 23, 31, 30, 0, time.UTC), nil},
-		// errors
 		{"2006", time.Time{}, internal.ErrSyntax},
 		{testing.T{}, time.Time{}, internal.ErrSyntax},
 	}
@@ -584,7 +583,7 @@ func TestToDuration(t *testing.T) {
 		err    error
 	}{
 		{time.Duration(5), d, nil},
-		{int(5), d, nil},
+		{5, d, nil},
 		{int64(5), d, nil},
 		{int32(5), d, nil},
 		{int16(5), d, nil},
@@ -596,21 +595,56 @@ func TestToDuration(t *testing.T) {
 		{uint8(5), d, nil},
 		{float64(5), d, nil},
 		{float32(5), d, nil},
-		{string("5"), d, nil},
-		{string("5ns"), d, nil},
-		{string("5us"), time.Microsecond * d, nil},
-		{string("5µs"), time.Microsecond * d, nil},
-		{string("5ms"), time.Millisecond * d, nil},
-		{string("5s"), time.Second * d, nil},
-		{string("5m"), time.Minute * d, nil},
-		{string("5h"), time.Hour * d, nil},
-		// errors
+		{"5", d, nil},
+		{"5ns", d, nil},
+		{"5us", time.Microsecond * d, nil},
+		{"5µs", time.Microsecond * d, nil},
+		{"5ms", time.Millisecond * d, nil},
+		{"5s", time.Second * d, nil},
+		{"5m", time.Minute * d, nil},
+		{"5h", time.Hour * d, nil},
 		{"test", 0, internal.ErrSyntax},
 		{testing.T{}, 0, internal.ErrSyntax},
 	}
 
 	for _, test := range tests {
 		v, err := ToDuration(test.input)
+		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
+			fmt.Printf("%#v\n", test)
+			fmt.Println(v, err)
+		}
+	}
+}
+
+func TestToBool(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect bool
+		err    error
+	}{
+		{0, false, nil},
+		{nil, false, internal.ErrSyntax},
+		{"false", false, nil},
+		{"FALSE", false, nil},
+		{"False", false, nil},
+		{"f", false, nil},
+		{"F", false, nil},
+		{false, false, nil},
+		{"true", true, nil},
+		{"TRUE", true, nil},
+		{"True", true, nil},
+		{"t", true, nil},
+		{"T", true, nil},
+		{1, true, nil},
+		{1.1, true, nil},
+		{true, true, nil},
+		{-1, true, nil},
+		{"test", false, internal.ErrSyntax},
+		{testing.T{}, false, internal.ErrSyntax},
+	}
+
+	for _, test := range tests {
+		v, err := ToBool(test.input)
 		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
 			fmt.Printf("%#v\n", test)
 			fmt.Println(v, err)

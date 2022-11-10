@@ -540,7 +540,7 @@ func ToDuration(i interface{}) (d time.Duration, err error) {
 		}
 	case string:
 		// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-		if strings.ContainsAny(v, "smh nuµ") {
+		if strings.ContainsAny(v, "smh"+"nuµ") {
 			if d, err = time.ParseDuration(v); err == nil {
 				return d, err
 			}
@@ -552,4 +552,44 @@ func ToDuration(i interface{}) (d time.Duration, err error) {
 	}
 
 	return 0, internal.SyntaxError(i, reflect.TypeOf((*time.Duration)(nil)).Elem().String())
+}
+
+func ToBool(i interface{}) (bool, error) {
+	i = internal.Indirect(i)
+	switch v := i.(type) {
+	case bool:
+		return v, nil
+	case int:
+		return internal.IntToBool[int](v), nil
+	case int64:
+		return internal.IntToBool[int64](v), nil
+	case int32:
+		return internal.IntToBool[int32](v), nil
+	case int16:
+		return internal.IntToBool[int16](v), nil
+	case int8:
+		return internal.IntToBool[int8](v), nil
+	case uint:
+		return internal.IntToBool[uint](v), nil
+	case uint64:
+		return internal.IntToBool[uint64](v), nil
+	case uint32:
+		return internal.IntToBool[uint32](v), nil
+	case uint16:
+		return internal.IntToBool[uint16](v), nil
+	case uint8:
+		return internal.IntToBool[uint8](v), nil
+	case float32:
+		return internal.IntToBool[float32](v), nil
+	case float64:
+		return internal.IntToBool[float64](v), nil
+	case string:
+		if b, err := strconv.ParseBool(i.(string)); err == nil {
+			return b, nil
+		} else {
+			return false, internal.SyntaxError(i, reflect.Bool.String())
+		}
+	default:
+		return false, internal.SyntaxError(i, reflect.Bool.String())
+	}
 }

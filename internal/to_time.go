@@ -40,10 +40,10 @@ var timeLayout = []string{
 func StringToTime(in string) (ret time.Time, err error) {
 	for _, layout := range timeLayout {
 		if ret, err = time.Parse(layout, in); err == nil {
-			return
+			return ret, err
 		}
 	}
-	return ret, SyntaxError(in, reflect.TypeOf((*time.Time)(nil)).Elem().String())
+	return time.Time{}, SyntaxError(in, reflect.TypeOf((*time.Time)(nil)).Elem().String())
 }
 
 func IntToTime[Input SignedInt | UnsignedInt](in Input) (ret time.Time, err error) {
