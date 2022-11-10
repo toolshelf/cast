@@ -176,25 +176,25 @@ func StringToInt[Output SignedInt](in string) (ret Output, err error) {
 		if ret, inErr = IntToInt[int64, Output](i); inErr == nil {
 			return ret, nil
 		} else if errors.Is(inErr, ErrRange) {
-			return 0, RangeError(in, reflect.TypeOf(ret).String())
+			return ret, RangeError(in, reflect.TypeOf(ret).String())
 		}
 	} else if errors.Is(inErr, strconv.ErrRange) {
-		return 0, RangeError(in, reflect.TypeOf(ret).String())
+		return ret, RangeError(in, reflect.TypeOf(ret).String())
 	}
 
 	if f, inErr := strconv.ParseFloat(in, 64); inErr == nil {
 		if ret, inErr = FloatToInt[float64, Output](f); inErr == nil {
 			return ret, nil
 		} else if errors.Is(inErr, ErrSafe) {
-			return 0, SafeError(in, reflect.TypeOf(ret).String())
+			return ret, SafeError(in, reflect.TypeOf(ret).String())
 		} else if errors.Is(inErr, ErrRange) {
-			return 0, RangeError(in, reflect.TypeOf(ret).String())
+			return ret, RangeError(in, reflect.TypeOf(ret).String())
 		}
 	} else if errors.Is(inErr, strconv.ErrRange) {
-		return 0, RangeError(in, reflect.TypeOf(ret).String())
+		return ret, RangeError(in, reflect.TypeOf(ret).String())
 	}
 
-	return 0, SyntaxError(in, reflect.TypeOf(ret).String())
+	return ret, SyntaxError(in, reflect.TypeOf(ret).String())
 }
 
 func StringToUint[Output UnsignedInt](in string) (ret Output, err error) {
