@@ -620,3 +620,70 @@ func TestMustToBool(t *testing.T) {
 		}
 	}
 }
+
+func TestMustToStringMapString(t *testing.T) {
+	var stringMapString = map[string]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var stringMapInterface = map[string]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapString = map[interface{}]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapInterface = map[interface{}]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var jsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}`
+	var invalidJsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"`
+	var emptyString = ""
+	var expect = map[string]string{}
+
+	tests := []struct {
+		input   interface{}
+		expect  map[string]string
+		isPanic bool
+	}{
+		{stringMapString, stringMapString, false},
+		{stringMapInterface, stringMapString, false},
+		{interfaceMapString, stringMapString, false},
+		{interfaceMapInterface, stringMapString, false},
+		{jsonString, stringMapString, false},
+
+		{nil, expect, true},
+		{testing.T{}, expect, true},
+		{invalidJsonString, expect, true},
+		{emptyString, expect, true},
+	}
+
+	for _, test := range tests {
+		if test.isPanic {
+			assert.Panics(t, func() { MustToStringMapString(test.input) })
+		} else {
+			v := MustToStringMapString(test.input)
+			if !assert.Equal(t, test.expect, v) {
+				fmt.Printf("%#v\n", test)
+			}
+		}
+	}
+}
+
+func TestMustToStringMapAny(t *testing.T) {
+	tests := []struct {
+		input   interface{}
+		expect  map[string]interface{}
+		isPanic bool
+	}{
+		{map[interface{}]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}, false},
+		{map[string]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}, false},
+		{`{"tag": "tags", "group": "groups"}`, map[string]interface{}{"tag": "tags", "group": "groups"}, false},
+		{`{"tag": "tags", "group": true}`, map[string]interface{}{"tag": "tags", "group": true}, false},
+
+		{nil, map[string]interface{}{}, true},
+		{testing.T{}, map[string]interface{}{}, true},
+		{"", map[string]interface{}{}, true},
+	}
+
+	for _, test := range tests {
+		if test.isPanic {
+			assert.Panics(t, func() { MustToStringMapAny(test.input) })
+		} else {
+			v := MustToStringMapAny(test.input)
+			if !assert.Equal(t, test.expect, v) {
+				fmt.Printf("%#v\n", test)
+			}
+		}
+	}
+}

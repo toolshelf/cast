@@ -593,3 +593,63 @@ func ToBool(i interface{}) (bool, error) {
 		return false, internal.SyntaxError(i, reflect.Bool.String())
 	}
 }
+
+func ToStringMapString(i interface{}) (map[string]string, error) {
+	var m = map[string]string{}
+
+	switch v := i.(type) {
+	case map[string]string:
+		if v == nil {
+			return m, nil
+		}
+		return v, nil
+	case map[string]interface{}:
+		for k, val := range v {
+			m[DirectToString(k)] = DirectToString(val)
+		}
+		return m, nil
+	case map[interface{}]string:
+		for k, val := range v {
+			m[DirectToString(k)] = DirectToString(val)
+		}
+		return m, nil
+	case map[interface{}]interface{}:
+		for k, val := range v {
+			m[DirectToString(k)] = DirectToString(val)
+		}
+		return m, nil
+	case string:
+		if err := internal.JsonStringToObject(v, &m); err != nil {
+			return m, internal.SyntaxError(i, reflect.TypeOf(m).String())
+		} else {
+			return m, nil
+		}
+	default:
+		return m, internal.SyntaxError(i, reflect.TypeOf(m).String())
+	}
+}
+
+func ToStringMapAny(i interface{}) (map[string]interface{}, error) {
+	var m = map[string]interface{}{}
+
+	switch v := i.(type) {
+	case map[string]interface{}:
+		if v == nil {
+			return m, nil
+		}
+		return v, nil
+	case map[interface{}]interface{}:
+		for key, val := range v {
+			m[DirectToString(key)] = val
+		}
+		return m, nil
+	case string:
+		if err := internal.JsonStringToObject(v, &m); err != nil {
+			return m, internal.SyntaxError(i, reflect.TypeOf(m).String())
+		} else {
+			return m, nil
+		}
+	default:
+		return m, internal.SyntaxError(i, reflect.TypeOf(m).String())
+	}
+}

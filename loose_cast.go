@@ -129,3 +129,19 @@ func DirectToDuration(i interface{}, expect ...time.Duration) time.Duration {
 	}
 	return v
 }
+
+func DirectToStringMapString(i interface{}, expect ...map[string]string) map[string]string {
+	v, err := ToStringMapString(i)
+	if err != nil && len(expect) != 0 {
+		return expect[0]
+	}
+	return v
+}
+
+func DirectToStringMapAny(i interface{}, expect ...map[string]interface{}) map[string]interface{} {
+	v, err := ToStringMapAny(i)
+	if err != nil && len(expect) != 0 {
+		return expect[0]
+	}
+	return v
+}

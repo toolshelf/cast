@@ -540,3 +540,60 @@ func TestDirectToBool(t *testing.T) {
 		}
 	}
 }
+
+func TestDirectToStringMapString(t *testing.T) {
+	var stringMapString = map[string]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var stringMapInterface = map[string]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapString = map[interface{}]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapInterface = map[interface{}]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var jsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}`
+	var invalidJsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"`
+	var emptyString = ""
+	var expect = map[string]string{"666": "999"}
+
+	tests := []struct {
+		input  interface{}
+		expect map[string]string
+	}{
+		{stringMapString, stringMapString},
+		{stringMapInterface, stringMapString},
+		{interfaceMapString, stringMapString},
+		{interfaceMapInterface, stringMapString},
+		{jsonString, stringMapString},
+
+		{nil, expect},
+		{testing.T{}, expect},
+		{invalidJsonString, expect},
+		{emptyString, expect},
+	}
+
+	for _, test := range tests {
+		v := DirectToStringMapString(test.input, test.expect)
+		if !assert.Equal(t, test.expect, v) {
+			fmt.Printf("%#v\n", test)
+		}
+	}
+}
+
+func TestDirectToStringMapAny(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect map[string]interface{}
+	}{
+		{map[interface{}]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}},
+		{map[string]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}},
+		{`{"tag": "tags", "group": "groups"}`, map[string]interface{}{"tag": "tags", "group": "groups"}},
+		{`{"tag": "tags", "group": true}`, map[string]interface{}{"tag": "tags", "group": true}},
+
+		{nil, map[string]interface{}{}},
+		{testing.T{}, map[string]interface{}{}},
+		{"", map[string]interface{}{}},
+	}
+
+	for _, test := range tests {
+		v := DirectToStringMapAny(test.input, test.expect)
+		if !assert.Equal(t, test.expect, v) {
+			fmt.Printf("%#v\n", test)
+		}
+	}
+}

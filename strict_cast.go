@@ -129,3 +129,19 @@ func MustToDuration(i interface{}) time.Duration {
 	}
 	return v
 }
+
+func MustToStringMapString(i interface{}) map[string]string {
+	v, err := ToStringMapString(i)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func MustToStringMapAny(i interface{}) map[string]interface{} {
+	v, err := ToStringMapAny(i)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}

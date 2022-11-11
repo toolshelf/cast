@@ -651,3 +651,63 @@ func TestToBool(t *testing.T) {
 		}
 	}
 }
+
+func TestToStringMapString(t *testing.T) {
+	var stringMapString = map[string]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var stringMapInterface = map[string]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapString = map[interface{}]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapInterface = map[interface{}]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var jsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}`
+	var invalidJsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"`
+	var emptyString = ""
+
+	tests := []struct {
+		input  interface{}
+		expect map[string]string
+		err    error
+	}{
+		{stringMapString, stringMapString, nil},
+		{stringMapInterface, stringMapString, nil},
+		{interfaceMapString, stringMapString, nil},
+		{interfaceMapInterface, stringMapString, nil},
+		{jsonString, stringMapString, nil},
+
+		{nil, map[string]string{}, internal.ErrSyntax},
+		{testing.T{}, map[string]string{}, internal.ErrSyntax},
+		{invalidJsonString, map[string]string{}, internal.ErrSyntax},
+		{emptyString, map[string]string{}, internal.ErrSyntax},
+	}
+
+	for _, test := range tests {
+		v, err := ToStringMapString(test.input)
+		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
+			fmt.Printf("%#v\n", test)
+			fmt.Println(v, err)
+		}
+	}
+}
+
+func TestToStringMapAny(t *testing.T) {
+	tests := []struct {
+		input  interface{}
+		expect map[string]interface{}
+		err    error
+	}{
+		{map[interface{}]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}, nil},
+		{map[string]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}, nil},
+		{`{"tag": "tags", "group": "groups"}`, map[string]interface{}{"tag": "tags", "group": "groups"}, nil},
+		{`{"tag": "tags", "group": true}`, map[string]interface{}{"tag": "tags", "group": true}, nil},
+
+		{nil, map[string]interface{}{}, internal.ErrSyntax},
+		{testing.T{}, map[string]interface{}{}, internal.ErrSyntax},
+		{"", map[string]interface{}{}, internal.ErrSyntax},
+	}
+
+	for _, test := range tests {
+		v, err := ToStringMapAny(test.input)
+		if !assert.Equal(t, test.expect, v) || !assert.True(t, errors.Is(err, test.err)) {
+			fmt.Printf("%#v\n", test)
+			fmt.Println(v, err)
+		}
+	}
+}
